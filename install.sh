@@ -7,7 +7,6 @@ set -e
 INSTALL_DIR="$HOME/.local/share/rosestrap"
 BIN_DIR="$HOME/.local/bin"
 DESKTOP_DIR="$HOME/.local/share/applications"
-ICON_DIR="$HOME/.local/share/icons/hicolor/76x76/apps"
 SOBER_APP_ID="org.vinegarhq.Sober"
 REPO_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -99,9 +98,38 @@ EOF
 chmod +x "$BIN_DIR/rosestrap"
 
 # --- 7. Create desktop entry ----------------------------------------------------
-mkdir -p "$DESKTOP_DIR" "$ICON_DIR"
+mkdir -p "$DESKTOP_DIR"
+
+# Install icon into standard hicolor sizes so desktop environments actually
+# pick it up (non-standard sizes like 76x76 are often ignored by icon lookup).
+PIXMAPS_DIR="$HOME/.local/share/pixmaps"
+mkdir -p "$PIXMAPS_DIR" \
+         "$HOME/.local/share/icons/hicolor/64x64/apps" \
+         "$HOME/.local/share/icons/hicolor/128x128/apps"
+
+SRC_ICON=""
 if [ -f "$INSTALL_DIR/rosestrap_logo_76.png" ]; then
-    cp "$INSTALL_DIR/rosestrap_logo_76.png" "$ICON_DIR/rosestrap.png"
+    SRC_ICON="$INSTALL_DIR/rosestrap_logo_76.png"
+elif [ -f "$INSTALL_DIR/rosestrap_logo_30.png" ]; then
+    SRC_ICON="$INSTALL_DIR/rosestrap_logo_30.png"
+fi
+
+if [ -n "$SRC_ICON" ]; then
+    # Fallback location many DEs check regardless of size
+    cp "$SRC_ICON" "$PIXMAPS_DIR/rosestrap.png"
+    # Proper hicolor theme locations
+    cp "$SRC_ICON" "$HOME/.local/share/icons/hicolor/64x64/apps/rosestrap.png"
+    cp "$SRC_ICON" "$HOME/.local/share/icons/hicolor/128x128/apps/rosestrap.png"
+
+    # Refresh icon cache so the new icon is picked up immediately
+    if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+        gtk-update-icon-cache -f -t "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
+    fi
+    if command -v xdg-icon-resource >/dev/null 2>&1; then
+        xdg-icon-resource install --noupdate --size 128 "$SRC_ICON" rosestrap >/dev/null 2>&1 || true
+    fi
+else
+    echo "[!] No logo file found, skipping icon install"
 fi
 
 cat > "$DESKTOP_DIR/rosestrap.desktop" <<EOF
