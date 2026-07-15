@@ -22,8 +22,16 @@ fi
 
 # --- 1. Pull latest source if this folder is a git repo ---------------------
 if [ -d "$REPO_SRC/.git" ]; then
-    echo "[..] Pulling latest changes from git..."
-    git -C "$REPO_SRC" pull --ff-only
+    echo "[..] Fetching latest changes..."
+    git -C "$REPO_SRC" fetch --all --quiet
+
+    BRANCH="$(git -C "$REPO_SRC" symbolic-ref --short HEAD 2>/dev/null || echo main)"
+
+    # This install directory is a deployed copy, not a working copy - any
+    # local edits (e.g. from manual testing) shouldn't block updates. Hard
+    # reset to whatever is on the remote branch.
+    git -C "$REPO_SRC" reset --hard "origin/$BRANCH"
+    git -C "$REPO_SRC" clean -fd --quiet
 else
     echo "[!] Not a git checkout, skipping git pull."
     echo "    (Download/extract the latest release into this folder first if needed.)"
