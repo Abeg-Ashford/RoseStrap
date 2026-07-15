@@ -35,6 +35,9 @@ rsync -a --exclude '__pycache__' --exclude '.git' --exclude 'install.sh' --exclu
     "$REPO_SRC"/ "$INSTALL_DIR"/ 2>/dev/null || \
     cp -r "$REPO_SRC"/* "$INSTALL_DIR"/
 
+# Make sure shipped scripts stay executable regardless of source permissions.
+chmod +x "$INSTALL_DIR"/update.sh "$INSTALL_DIR"/uninstall.sh 2>/dev/null || true
+
 # --- 3. Refresh icon in case it changed --------------------------------------
 SRC_ICON=""
 if [ -f "$INSTALL_DIR/rosestrap_logo_76.png" ]; then
