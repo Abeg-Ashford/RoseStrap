@@ -53,15 +53,6 @@ Once installed, launch it from your app menu, or run:
 rosestrap
 ```
 
-## Update
-
-To update to the latest version:
-
-```bash
-cd RoseStrap
-chmod +x update.sh
-./update.sh
-```
 
 ## Manual run (without installing)
 
