@@ -24,5 +24,3 @@ ModManager
 Subtitle = RoseStrap — a Blox Strap fork for Sober (https://github.com/Abeg-Ashford/RoseStrap)
 Image = rosestrap_logo_76.png |
 
-CreateButton = Check for Updates
-CreateButton > update.sh
