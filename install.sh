@@ -88,6 +88,10 @@ mkdir -p "$INSTALL_DIR"
 rsync -a --exclude '__pycache__' --exclude 'install.sh' "$REPO_SRC"/ "$INSTALL_DIR"/ 2>/dev/null || \
     cp -r "$REPO_SRC"/* "$INSTALL_DIR"/
 
+# Make sure shipped scripts are executable regardless of what permissions
+# they had in git/the source folder.
+chmod +x "$INSTALL_DIR"/update.sh "$INSTALL_DIR"/uninstall.sh 2>/dev/null || true
+
 # --- 6. Create launcher script -------------------------------------------------
 mkdir -p "$BIN_DIR"
 cat > "$BIN_DIR/rosestrap" <<EOF
